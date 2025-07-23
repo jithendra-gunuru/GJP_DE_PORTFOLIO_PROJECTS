@@ -1,0 +1,9 @@
+gcloud storage buckets create gs://karkinos-health-client
+or
+gsutil mb gs://karkinos-health-client
+
+echo "test" | gsutil cp - gs://karkinos-health-client/dataflow/raw/patients/output/test.txt
+echo "test" | gsutil cp - gs://karkinos-health-client/dataflow/temp/test.txt
+echo "test" | gsutil cp - gs://karkinos-health-client/dataflow/staging/test.txt
+echo "test" | gsutil cp - gs://karkinos-health-client/dataflow/templates/test.txt
+

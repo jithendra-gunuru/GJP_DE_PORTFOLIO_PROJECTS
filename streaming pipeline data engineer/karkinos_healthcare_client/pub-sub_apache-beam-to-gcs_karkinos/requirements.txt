@@ -1,0 +1,148 @@
+# Inside your project folder
+# In your project folder:
+python -m venv env
+py -3.11 -m venv env_beam311
+
+# Activate it:
+# On Windows CMD:
+env\Scripts\activate
+.\env_beam311\Scripts\activate
+
+# On PowerShell:
+env\Scripts\Activate.ps1
+
+# On Linux/Mac:
+source env/bin/activate
+deactivate
+
+new env: 
+python -m pip install --upgrade pip setuptools wheel (if required)
+
+pip install --upgrade pip setuptools wheel
+pip install "apache-beam[gcp]"  
+pip install google-cloud-storage
+pip install google-cloud-pubsub
+
+
+
+# Install required libs
+# 1. Apache Beam with GCP support
+pip install "apache-beam[gcp]"
+if error: pip install --upgrade pip setuptools wheel
+
+pip show apache-beam
+
+python -c "import apache_beam; print(apache_beam.__version__)"
+
+GCS Client:
+pip install google-cloud-storage
+
+Pub/Sub Client:
+pip install google-cloud-pubsub
+
+(Optional) BigQuery Client:
+pip install google-cloud-bigquery
+
+How to Fix (Guaranteed Real-World Solution):
+1. Upgrade All Dependencies (force-reinstall required versions)
+Run these commands in your activated venv:
+
+pip install --upgrade pip setuptools wheel
+pip install --upgrade apache-beam[gcp]
+pip install --upgrade apitools
+pip install --upgrade protorpc
+pip install --upgrade protorpclite
+
+If pip warns about conflicts, always choose to --upgrade the latest.
+
+2. If the Error Persists, Do This (Cleans Up All Old Versions):
+A. Uninstall all conflicting packages:
+
+pip uninstall apache-beam apitools protorpc protorpclite -y 
+
+B. Reinstall only Beam (it will pull correct versions):
+pip install "apache-beam[gcp]"
+
+python pubsub_to_gcs.py --project gcp-de-vaarahi-b38 --region asia-south1 --input_subscription projects/gcp-de-vaarahi-b38/subscriptions/patient-events-sub --output_path gs://karkinos-health-client/dataflow/raw/patients/output --staging_location gs://karkinos-health-client/dataflow/staging --temp_location gs://karkinos-health-client/dataflow/temp --runner DirectRunner --streaming
+
+Check your Pub/Sub subscription actually exists with this project ID:
+
+Use gcloud to confirm:
+gcloud pubsub subscriptions list --project=gcp-de-vaarahi-b38
+
+gcs:
+folder structure:
+The “extra folders” you see in GCS (like /2025/07/17/06/) are created by design, because your Beam script is set to organize 
+(partition) files by year/month/day/hour.
+
+Your File Naming Pattern
+When you use this line (in the Beam DoFn):
+filename = f"{prefix}/message-{datetime.utcnow().strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:6]}.json"
+You get files in your GCS bucket like:
+gs://karkinos-health-client/dataflow/raw/patients/output/2025/07/17/06/message-20250717-170655-e8bbe6.json
+What Does Each Part Mean?
+Example filename:
+message-20250717-170655-e8bbe6.json
+
+Part	Example Value	What it Means
+message-	(literal)	Prefix for clarity (could be any string)
+20250717	2025/07/17	Date: YearMonthDay (2025-07-17)
+-170655	17:06:55	Time: HourMinuteSecond (UTC)
+-e8bbe6	Random (hex)	Short unique ID (from uuid), prevents filename collisions for same second
+.json	(extension)	File type is JSON
+
+Why Use This Pattern?
+Timestamp:
+
+Lets you know exactly when the data/message was written (down to the second).
+
+Makes it easier to debug, audit, or trace issues in data pipelines.
+
+Random/Unique ID:
+
+Prevents files from overwriting each other if two events happen at the same second.
+
+Ensures all files have a unique name, even if written in parallel (very common in streaming).
+
+Partitions in Path:
+
+Folders for year/month/day/hour make querying, processing, and managing data at scale fast and efficient.
+
+How is This Used in Real World?
+Downstream systems (PySpark, BigQuery, Dataflow, Dataproc) can process files by partition/time, making data easy to manage.
+
+Auditing: You always know exactly when a record arrived.
+
+Data retention: Easy to delete old data just by deleting old folders (e.g., remove data older than 30 days).
+
+No collision: Multiple workers can safely write files at the same second without conflict.
+
+What Can You Say in Interviews?
+“Our GCS output files are named using event time and a short UUID for uniqueness, like message-20250717-170655-e8bbe6.json. 
+This ensures all files are traceable by timestamp and never collide, which is a key pattern for scalable, reliable data lakes.”
+
+python pubsub_to_gcs_batch.py --project gcp-de-vaarahi-b38 --region asia-south1 --input_subscription projects/gcp-de-vaarahi-b38/subscriptions/patient-events-sub --output_path gs://karkinos-health-client/dataflow/raw/patients/output --staging_location gs://karkinos-health-client/dataflow/staging --temp_location gs://karkinos-health-client/dataflow/temp --runner DirectRunner --streaming
+
+ showing data every data for every minute, now why 17 came to times?
+
+ChatGPT said:
+Excellent question, bro!
+Let’s decode exactly why you’re seeing that extra “17” folder under the day, and then subfolders like 34/, 35/, 37/, 38/:
+
+What Your Path Means
+Your GCS path is like:
+
+gs://karkinos-health-client/dataflow/raw/patients/output/2025/07/17/17/34/
+gs://karkinos-health-client/dataflow/raw/patients/output/2025/07/17/17/35/
+2025 → Year
+
+07 → Month
+
+17 → Day
+
+17 → Hour (5 PM, 24-hour format)
+
+34 → Minute (i.e., 5:34 PM)
+
+35 → Minute (i.e., 5:35 PM)
+

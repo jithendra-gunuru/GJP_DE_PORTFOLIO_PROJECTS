@@ -1,0 +1,8 @@
+python pubsub_to_gcs.py --project GCP-DE-VAARAHI-B38 --region asia-south1 --input_subscription projects/GCP-DE-VAARAHI-B38/subscriptions/patient-events-sub --output_path gs://karkinos-health-client/dataflow/raw/patients/output --staging_location gs://karkinos-health-client/dataflow/staging --temp_location gs://karkinos-health-client/dataflow/temp --runner DirectRunner --streaming
+
+For local testing:
+--runner DirectRunner
+
+For GCP Dataflow:
+Change --runner DataflowRunner
+

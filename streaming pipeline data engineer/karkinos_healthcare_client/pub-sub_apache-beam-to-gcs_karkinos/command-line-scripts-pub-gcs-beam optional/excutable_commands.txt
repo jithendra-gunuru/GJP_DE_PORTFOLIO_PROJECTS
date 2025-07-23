@@ -1,0 +1,20 @@
+Windowed Version
+python your_script_windowed.py \
+  --project gcp-de-vaarahi-b38 \
+  --region asia-south1 \
+  --input_subscription projects/gcp-de-vaarahi-b38/subscriptions/patient-events-sub \
+  --output_path gs://karkinos-health-client/dataflow/raw/patients/output \
+  --staging_location gs://karkinos-health-client/dataflow/staging \
+  --temp_location gs://karkinos-health-client/dataflow/temp \
+  --window_size 60 \
+  --runner DataflowRunner
+
+Per-Message Version
+python your_script_per_message.py \
+  --project gcp-de-vaarahi-b38 \
+  --region asia-south1 \
+  --input_subscription projects/gcp-de-vaarahi-b38/subscriptions/patient-events-sub \
+  --output_path gs://karkinos-health-client/dataflow/raw/patients/output \
+  --staging_location gs://karkinos-health-client/dataflow/staging \
+  --temp_location gs://karkinos-health-client/dataflow/temp \
+  --runner DataflowRunner
