@@ -1,0 +1,10 @@
+api:
+  patients_url: "http://107.178.209.202:5001/patients"
+  appointments_url: "http://107.178.209.202:5002/appointments"
+  lab_results_url: "http://107.178.209.202:5003/lab_results"
+
+pubsub:
+  patients_topic: "projects/gcp-de-vaarahi-b38/topics/patient-events"
+  appointments_topic: "projects/gcp-de-vaarahi-b38/topics/appointment-events"
+  lab_results_topic: "projects/gcp-de-vaarahi-b38/topics/labresults-events"
+
