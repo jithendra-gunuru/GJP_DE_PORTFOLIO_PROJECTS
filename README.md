@@ -126,6 +126,4 @@ Each folder contains:
 
 ---
 
-**Want to add project badges, project stats, or a one-line summary for each folder?**\
-**Just ask—Bunny Bro will format it for you!**
 
