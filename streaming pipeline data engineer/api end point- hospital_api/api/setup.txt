@@ -1,4 +1,0 @@
-set vm in gcp
-ubuntu 22.04
-10 gb presistent disk
-
