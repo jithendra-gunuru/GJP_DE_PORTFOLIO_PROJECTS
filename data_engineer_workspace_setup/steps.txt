@@ -1,0 +1,66 @@
+🟢 Step 1: Create a Compute Engine VM
+Go to: Google Cloud Console – Compute Engine
+
+Click "Create Instance"
+
+Set these recommended options:
+
+Name: dataflow-runner-vm (or any name)
+
+Region/Zone: Choose closest to your Dataflow region (e.g., asia-south1-c)
+
+Machine type: e2-medium is fine (2 vCPU, 4GB RAM)
+
+Boot disk: Ubuntu 22.04 LTS (default, recommended)
+
+Allow HTTP/HTTPS traffic: Not needed unless you’re serving an app
+
+Firewall: Default (leave as is)
+
+Click "Create"
+
+🟢 Step 2: SSH Into Your VM
+In the console, click the SSH button next to your new VM.
+
+A browser window with a terminal opens.
+
+🟢 Step 3: Install Python 3.10 and Tools
+sudo apt-get update
+sudo apt-get install -y python3.10 python3.10-venv python3.10-distutils python3-pip
+
+Check Python:
+python3.10 --version (should show Python 3.10.x)
+
+🟢 Step 4: Install pip for Python 3.10
+curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
+
+Now, pip3.10 --version should show pip is ready.
+
+🟢 Step 5: Set Up Virtual Environment
+python3.10 -m venv sub_bq_venv
+source sub_bq_venv/bin/activate
+pip install --upgrade pip setuptools wheel
+
+🟢 Step 6: Install Google Cloud SDK (gcloud)
+Command 1:
+sudo apt-get install -y apt-transport-https ca-certificates gnupg
+Command 2:
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | \
+  sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+command 3:
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | \
+  sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+Command 4:
+sudo apt-get update && sudo apt-get install -y google-cloud-sdk
+
+
+🟢 Step 7: Authenticate gcloud & Set Project
+gcloud auth login
+gcloud config set project gcp-de-vaarahi-b38
+
+🟢 Step 8: Upload Your Script and Requirements
+Use the "Upload File" button in the SSH window, or use gcloud compute scp from your local machine:
+gcloud compute scp "E:\Streamline pipeline\bigquery\sub - bq\sub-bqtable.py" jithendra_gunuru2016@gcp-de-workspace: --zone=us-central1-c
+gcloud compute scp "E:\Streamline pipeline\bigquery\sub - bq\requirements.txt" jithendra_gunuru2016@gcp-de-workspace: --zone=us-central1-c
+
+pip install -r requirements.txt
